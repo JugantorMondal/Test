@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JM Notepad - Credits & Notes</title>
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1d2671 0%, #c33764 100%);
+            min-height: 100vh;
+            color: #1f1f1f;
+            padding: 20px 12px;
+        }
+        .page { display: none; min-height: 100vh; }
+        .page.active { display: flex; justify-content: center; align-items: center; }
+        .auth-container {
+            width: 100%; max-width: 420px; background: #fff;
+            border-radius: 22px; box-shadow: 0 25px 55px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+        header.auth-header {
+            background: linear-gradient(135deg,#232526,#414345);
+            color: white; text-align: center; padding: 28px 20px;
+        }
+        .form-container { padding: 30px; background:#f9f9ff; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display:block; margin-bottom:6px; font-weight:600; color:#2c3e50; }
+        .form-group input {
+            width:100%; padding:12px; border:2px solid #e2e2ee; border-radius:12px;
+            font-size:1rem; transition:border 0.2s;
+        }
+        .form-group input:focus {
+            outline:none; border-color:#c33764; box-shadow:0 0 0 3px rgba(195,55,100,0.15);
+        }
+        .btn {
+            border:none; border-radius:12px; padding:12px; font-size:1rem; font-weight:600;
+            cursor:pointer; width:100%; transition:transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg,#c33764,#1d2671);
+            color:white;
+        }
+        .btn-secondary { background:#8d99ae; color:white; }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 10px 18px rgba(0,0,0,0.15); }
+        .link-text { text-align:center; margin-top:15px; color:#6c757d; }
+        .link-text a { color:#c33764; font-weight:600; cursor:pointer; text-decoration:none; }
+        .link-text a:hover { text-decoration:underline; }
+        .error-message,.success-message {
+            display:none; padding:10px 12px; border-radius:10px; margin-bottom:14px;
+            font-size:0.9rem; font-weight:600; color:white;
+        }
+        .error-message { background:#e63946; }
+        .success-message { background:#2ecc71; }
+        #app-page { padding:0; }
+        .phone-shell {
+            width:100%; max-width:430px; min-height:760px;
+            background:linear-gradient(180deg,#f8f7ff 0%,#f3ecff 100%);
+            border-radius:40px; box-shadow:0 30px 70px rgba(0,0,0,0.3);
+            padding:22px 18px 105px; position:relative; display:flex; flex-direction:column;
+        }
+        .status-bar {
+            display:flex; justify-content:space-between; align-items:center;
+            color:#6d6a83; font-size:0.85rem; margin-bottom:12px;
+        }
+        .status-dot {
+            width:7px; height:7px; border-radius:50%; background:#2ecc71;
+            margin-left:6px; display:inline-block;
+        }
+        .note-card {
+            background:rgba(255,255,255,0.96); border-radius:28px;
+            padding:22px; flex:1; display:flex; flex-direction:column; gap:18px;
+        }
+        .balance-line { font-weight:700; color:#9a1f63; }
+        .detail-card {
+            background:linear-gradient(135deg,#ffe3ec,#fffbd5);
+            border-radius:18px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;
+            color:#5d2754; font-size:0.9rem;
+        }
+        .detail-row { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+        .detail-row span { font-weight:600; color:#3e1f68; }
+        .profile-inline {
+            align-self:flex-start; margin-top:6px;
+            background:linear-gradient(135deg,#ff758c,#ff7eb3);
+            border:none; color:white; padding:8px 18px; border-radius:999px;
+            font-weight:600; cursor:pointer;
+        }
+        .note-card h2 { margin:0; color:#2d1e56; }
+        .note-card p.subtitle { margin:0; color:#6d648a; }
+        .note-form {
+            background:#f1edff; border-radius:18px; padding:16px;
+            display:flex; flex-direction:column; gap:10px;
+        }
+        .note-form input,.note-form textarea {
+            border:none; border-radius:12px; padding:12px; background:white;
+            font-size:0.95rem;
+        }
+        .note-form textarea { min-height:90px; resize:none; }
+        .note-form input:focus,.note-form textarea:focus { outline:2px solid rgba(195,55,100,0.25); }
+        .note-save-btn {
+            background:linear-gradient(135deg,#36d1dc,#5b86e5);
+            color:white; border:none; border-radius:12px; padding:12px; font-weight:700; cursor:pointer;
+        }
+        .notes-title { font-weight:600; color:#6b4bb6; margin-top:6px; }
+        .notes-list { flex:1; overflow-y:auto; padding-bottom:10px; display:flex; flex-direction:column; gap:12px; }
+        .note-item {
+            background:white; border-radius:16px; padding:12px 14px;
+            box-shadow:0 12px 22px rgba(98,78,140,0.15);
+        }
+        .note-item h4 { margin:0 0 6px; color:#2d1e56; }
+        .note-item p { margin:0 0 8px; color:#5f6271; font-size:0.92rem; white-space:pre-wrap; }
+        .note-meta {
+            font-size:0.78rem; color:#9a97b5; display:flex; justify-content:space-between; align-items:center;
+        }
+        .note-delete { background:transparent; border:none; color:#e63946; cursor:pointer; font-weight:600; }
+        .placeholder { text-align:center; color:#b3a9d1; font-size:0.95rem; margin-top:10px; }
+        .shop-btn {
+            position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+            background:linear-gradient(135deg,#11cbd7,#3a7bd5);
+            color:white; border:none; border-radius:999px; padding:14px 32px; font-size:1rem; font-weight:700;
+            box-shadow:0 18px 40px rgba(17,203,215,0.35); cursor:pointer; display:flex; align-items:center; gap:10px;
+        }
+        .fab {
+            position:absolute; border:none; border-radius:16px; padding:12px 16px;
+            display:flex; align-items:center; gap:8px; font-weight:700; cursor:pointer;
+            box-shadow:0 15px 30px rgba(0,0,0,0.2); letter-spacing:0.5px;
+        }
+        .fab.profile {
+            top:-24px; right:18px; background:white; color:#c33764;
+            border-radius:999px; padding:10px 20px;
+        }
+        .fab.history {
+            top:18px; left:18px; background:linear-gradient(135deg,#232526,#414345);
+            color:white; border-radius:12px;
+        }
+        .fab.history span { font-family:'Courier New', monospace; font-size:1.4rem; }
+        .fab.chat {
+            bottom:40px; right:22px; background:#212121; color:#f1faee; border-radius:999px;
+        }
+        .modal {
+            position:fixed; inset:0; background:rgba(7,9,27,0.65);
+            display:none; justify-content:center; align-items:center; padding:20px; z-index:50;
+        }
+        .modal.show { display:flex; }
+        .modal-card {
+            background:#fff; border-radius:28px; width:100%; max-width:430px; max-height:90vh;
+            display:flex; flex-direction:column; overflow:hidden; position:relative;
+        }
+        .modal-header {
+            padding:22px 24px 16px; background:linear-gradient(135deg,#c33764,#1d2671);
+            color:white;
+        }
+        .modal-header h2 { margin:0; }
+        .modal-content { padding:20px 22px 28px; overflow-y:auto; flex:1; background:#fdfcff; }
+        .close-btn {
+            position:absolute; top:16px; right:18px; background:rgba(255,255,255,0.25);
+            color:white; border:none; border-radius:50%; width:34px; height:34px; font-size:1.1rem; cursor:pointer;
+        }
+        .package-row {
+            background:#12122f; border-radius:18px; padding:16px; margin-bottom:12px;
+            color:white; display:flex; justify-content:space-between; align-items:center;
+            box-shadow:0 15px 30px rgba(18,18,47,0.55);
+        }
+        .package-info h4 { margin:0; font-size:1rem; }
+        .package-info p { margin:6px 0 0; font-size:0.82rem; color:#a0a0ff; }
+        .package-action button {
+            background:#00f2a9; border:none; border-radius:999px; padding:8px 18px;
+            font-weight:700; cursor:pointer; color:#113e2f;
+        }
+        .profile-field { margin-bottom:14px; }
+        .profile-field label { display:block; font-size:0.85rem; color:#7e84a3; margin-bottom:6px; }
+        .profile-field input {
+            width:100%; border:2px solid #ece9ff; border-radius:14px; padding:12px; background:#fff;
+        }
+        .copy-wrap { display:flex; gap:10px; }
+        .copy-wrap input { flex:1; }
+        .copy-wrap button {
+            border:none; background:#6c63ff; color:white; border-radius:12px; padding:0 16px;
+            font-weight:600; cursor:pointer;
+        }
+        .profile-stats { display:flex; justify-content:space-between; gap:12px; margin:18px 0; }
+        .stat-card {
+            flex:1; background:#f0f4ff; border-radius:16px; padding:15px; text-align:center;
+        }
+        .stat-card h3 { margin:0; font-size:1.35rem; color:#1d2671; }
+        .stat-card span { font-size:0.8rem; color:#7f7ba1; }
+        .history-list { display:flex; flex-direction:column; gap:12px; }
+        .history-item {
+            background:white; border-radius:16px; padding:14px; border-left:5px solid #c33764;
+            box-shadow:0 8px 20px rgba(195,55,100,0.2);
+        }
+        .history-item h4 { margin:0 0 4px; color:#37123c; }
+        .history-item p { margin:2px 0; font-size:0.85rem; color:#4e4c67; }
+        .empty-state { text-align:center; color:#a5a2c0; margin-top:30px; }
+        #processingModal .modal-card {
+            max-width:320px; text-align:center; background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:white;
+        }
+        .spinner {
+            width:62px; height:62px; border-radius:50%;
+            border:6px solid rgba(255,255,255,0.3); border-top-color:#fff;
+            animation:spin 1s linear infinite; margin:0 auto 18px;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        #toast {
+            position:fixed; left:50%; transform:translateX(-50%); bottom:-80px;
+            background:#2ecc71; color:white; padding:12px 24px; border-radius:999px;
+            box-shadow:0 12px 28px rgba(46,204,113,0.45); font-weight:600;
+            transition:bottom 0.3s ease; z-index:100;
+        }
+        #toast.show { bottom:35px; }
+        @media (max-width:520px) {
+            .phone-shell { border-radius:28px; padding-bottom:120px; }
+            .fab.profile { top:-20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="login-page" class="page active">
+        <div class="auth-container">
+            <header class="auth-header">
+                <h1>JM Notepad</h1>
+                <p>Capture thoughts & manage credits</p>
+            </header>
+            <div class="form-container">
+                <div id="login-error" class="error-message"></div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="you@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="********">
+                </div>
+                <button class="btn btn-primary" onclick="login()">Sign In</button>
+                <div class="link-text">
+                    <a onclick="showPage('forgot-page')">Forgot password?</a>
+                </div>
+                <div class="link-text">
+                    Need an account? <a onclick="showPage('register-page')">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="register-page" class="page">
+        <div class="auth-container">
+            <header class="auth-header">
+                <h1>Join JM Notepad</h1>
+                <p>Notebook • Wallet • Peace of mind</p>
+            </header>
+            <div class="form-container">
+                <div id="register-error" class="error-message"></div>
+                <div id="register-success" class="success-message"></div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="register-name" placeholder="Jane Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="register-email" placeholder="you@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="register-confirm" placeholder="Re-type password">
+                </div>
+                <button class="btn btn-primary" onclick="register()">Create Account</button>
+                <div class="link-text">
+                    Already registered? <a onclick="showPage('login-page')">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="forgot-page" class="page">
+        <div class="auth-container">
+            <header class="auth-header">
+                <h1>Need a reset?</h1>
+                <p>We’ll send your hint instantly</p>
+            </header>
+            <div class="form-container">
+                <div id="forgot-error" class="error-message"></div>
+                <div id="forgot-success" class="success-message"></div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="forgot-email" placeholder="you@email.com">
+                </div>
+                <button class="btn btn-primary" onclick="forgotPassword()">Send reset tip</button>
+                <button class="btn btn-secondary" style="margin-top:10px;" onclick="showPage('login-page')">Back to login</button>
+            </div>
+        </div>
+    </div>
+    <div id="app-page" class="page">
+        <div class="phone-shell">
+            <button class="fab profile" id="openProfile">Profile</button>
+            <button class="fab history" id="openTransactions"><span>☰</span> History</button>
+            <button class="fab chat" onclick="showToast('Support coming soon ✨')">💬</button>
+            <div class="status-bar">
+                <span id="status-time">11:36</span>
+                <span>JM Notepad • Online<span class="status-dot"></span></span>
+            </div>
+            <div class="note-card">
+                <div class="balance-line">Balance: <span id="balanceDisplay">0.00 Credits</span></div>
+                <div class="detail-card">
+                    <div class="detail-row"><span>Email:</span><span id="detailEmail">—</span></div>
+                    <div class="detail-row"><span>UID:</span><span id="detailUID">—</span></div>
+                    <button class="profile-inline" onclick="openProfile()">View Full Profile</button>
+                </div>
+                <h2>Welcome to JM Notepad!</h2>
+                <p class="subtitle">Write quick notes, then grab credits whenever you need.</p>
+                <div class="note-form">
+                    <input id="noteTitle" type="text" placeholder="Note title">
+                    <textarea id="noteBody" placeholder="Type your idea, reminder, or to-do..."></textarea>
+                    <button class="note-save-btn" type="button" onclick="addNote()">Save note</button>
+                </div>
+                <div class="notes-title">Your notes</div>
+                <div class="notes-list" id="notesList">
+                    <div class="placeholder">No notes yet. Tap Save note to get started! 📝</div>
+                </div>
+            </div>
+            <button class="shop-btn" id="openShop">🛒 Shop Credits</button>
+        </div>
+    </div>
+    <div class="modal" id="shopModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Buy Credits</h2>
+                <p>Total Balance: <span id="modalBalance">0.00 Credits</span></p>
+                <button class="close-btn" onclick="closeModal('shopModal')">✕</button>
+            </div>
+            <div class="modal-content" id="packagesList"></div>
+        </div>
+    </div>
+    <div class="modal" id="profileModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <button class="close-btn" onclick="closeModal('profileModal')">✕</button>
+            </div>
+            <div class="modal-content">
+                <div class="profile-field">
+                    <label>Name</label>
+                    <input type="text" id="profileNameInput" placeholder="Your name">
+                </div>
+                <div class="profile-field">
+                    <label>Email</label>
+                    <input type="text" id="profileEmail" disabled>
+                </div>
+                <div class="profile-field">
+                    <label>UID</label>
+                    <div class="copy-wrap">
+                        <input type="text" id="profileUID" readonly>
+                        <button onclick="copyText('profileUID')">Copy</button>
+                    </div>
+                </div>
+                <div class="profile-field">
+                    <label>Numeric UID</label>
+                    <div class="copy-wrap">
+                        <input type="text" id="profileNumericUID" readonly>
+                        <button onclick="copyText('profileNumericUID')">Copy</button>
+                    </div>
+                </div>
+                <div class="profile-field">
+                    <label>Credits Balance</label>
+                    <input type="text" id="profileBalance" disabled>
+                </div>
+                <div class="profile-field">
+                    <label>Account Created</label>
+                    <input type="text" id="profileCreated" disabled>
+                </div>
+                <div class="profile-field">
+                    <label>Last Login</label>
+                    <input type="text" id="profileLastLogin" disabled>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <h3 id="statNotes">0</h3>
+                        <span>Notes</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statTransactions">0</h3>
+                        <span>Transactions</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statSpent">$0</h3>
+                        <span>Total Spent</span>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+                    <button class="btn btn-secondary" onclick="changePassword()">Change Password</button>
+                    <button class="btn btn-secondary" onclick="sendReset()">Send Password Reset Email</button>
+                    <button class="btn btn-primary" style="background:#e63946;" onclick="logout()">Log out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="historyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Transaction History</h2>
+                <button class="close-btn" onclick="closeModal('historyModal')">✕</button>
+            </div>
+            <div class="modal-content">
+                <div class="history-list" id="historyList">
+                    <div class="empty-state">No purchases yet. Grab credits from the Shop! 💸</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="processingModal">
+        <div class="modal-card">
+            <div class="spinner"></div>
+            <h3 id="processingText">Processing...</h3>
+            <p style="opacity:0.8;margin:0;">Talking to Google Play...</p>
+        </div>
+    </div>
+    <div id="toast">Saved!</div>
+
+    <script>
+        const pages = Array.from(document.querySelectorAll('.page'));
+        let currentUser = null;
+        let nextUserId = 2;
+
+        let users = [
+            {
+                id: 1,
+                name: "Demo User",
+                email: "demo@jmnotepad.app",
+                password: "demo123",
+                balance: 0,
+                transactions: [],
+                notes: [],
+                created: new Date().toISOString(),
+                lastLogin: null,
+                uid: "JM-" + Math.random().toString(36).substring(2, 10).toUpperCase(),
+                numericUID: String(Math.floor(Math.random() * 9_000_000) + 1_000_000)
+            }
+        ];
+
+        function showPage(id) {
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function login() {
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+            const error = document.getElementById('login-error');
+            if (!email || !password) {
+                error.textContent = "Enter both email and password.";
+                error.style.display = 'block';
+                return;
+            }
+            const user = users.find(u => u.email === email && u.password === password);
+            if (!user) {
+                error.textContent = "Invalid credentials. Try demo@jmnotepad.app / demo123";
+                error.style.display = 'block';
+                return;
+            }
+            error.style.display = 'none';
+            user.lastLogin = new Date().toISOString();
+            currentUser = user;
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+            showPage('app-page');
+            refreshAppUI();
+        }
+
+        function register() {
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim().toLowerCase();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            const error = document.getElementById('register-error');
+            const success = document.getElementById('register-success');
+            error.style.display = 'none';
+            success.style.display = 'none';
+
+            if (!name || !email || !password || !confirm) {
+                error.textContent = "Please fill every field.";
+                error.style.display = 'block';
+                return;
+            }
+            if (password !== confirm) {
+                error.textContent = "Passwords do not match.";
+                error.style.display = 'block';
+                return;
+            }
+            if (users.some(u => u.email === email)) {
+                error.textContent = "Email already registered.";
+                error.style.display = 'block';
+                return;
+            }
+            users.push({
+                id: nextUserId++,
+                name,
+                email,
+                password,
+                balance: 0,
+                transactions: [],
+                notes: [],
+                created: new Date().toISOString(),
+                lastLogin: null,
+                uid: "JM-" + Math.random().toString(36).substring(2, 10).toUpperCase(),
+                numericUID: String(Math.floor(Math.random() * 9_000_000) + 1_000_000)
+            });
+            document.getElementById('register-name').value = '';
+            document.getElementById('register-email').value = '';
+            document.getElementById('register-password').value = '';
+            document.getElementById('register-confirm').value = '';
+            success.textContent = "Account created! Redirecting to login...";
+            success.style.display = 'block';
+            setTimeout(() => showPage('login-page'), 1600);
+        }
+
+        function forgotPassword() {
+            const email = document.getElementById('forgot-email').value.trim().toLowerCase();
+            const error = document.getElementById('forgot-error');
+            const success = document.getElementById('forgot-success');
+            error.style.display = 'none';
+            success.style.display = 'none';
+            if (!email) {
+                error.textContent = "Enter the email you registered with.";
+                error.style.display = 'block';
+                return;
+            }
+            const user = users.find(u => u.email === email);
+            if (!user) {
+                error.textContent = "No account found for that email.";
+                error.style.display = 'block';
+                return;
+            }
+            document.getElementById('forgot-email').value = '';
+            success.textContent = `Password hint sent! (Demo: current password is "${user.password}")`;
+            success.style.display = 'block';
+        }
+
+        function refreshAppUI() {
+            updateBalanceUI();
+            renderNotes();
+            updateStatusTime();
+            populateDetailsCard();
+        }
+
+        function updateStatusTime() {
+            document.getElementById('status-time').textContent =
+                new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
+
+        function updateBalanceUI() {
+            if (!currentUser) return;
+            const balance = currentUser.balance.toFixed(2);
+            document.getElementById('balanceDisplay').textContent = `${balance} Credits`;
+            document.getElementById('modalBalance').textContent = `${balance} Credits`;
+            document.getElementById('profileBalance').value = `${balance} Credits`;
+        }
+
+        function populateDetailsCard() {
+            if (!currentUser) return;
+            document.getElementById('detailEmail').textContent = currentUser.email;
+            document.getElementById('detailUID').textContent = currentUser.uid;
+        }
+
+        function addNote() {
+            if (!currentUser) return;
+            const title = document.getElementById('noteTitle').value.trim() || 'Untitled';
+            const body = document.getElementById('noteBody').value.trim();
+            if (!body) {
+                showToast("Type something before saving 🙃", '#e63946');
+                return;
+            }
+            currentUser.notes.unshift({
+                id: Date.now(),
+                title,
+                body,
+                date: new Date().toISOString()
+            });
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteBody').value = '';
+            renderNotes();
+            showToast("Note saved ✅");
+        }
+
+        function deleteNote(id) {
+            currentUser.notes = currentUser.notes.filter(n => n.id !== id);
+            renderNotes();
+            showToast("Note deleted 🗑️", '#e63946');
+        }
+
+        function renderNotes() {
+            const list = document.getElementById('notesList');
+            if (!currentUser || currentUser.notes.length === 0) {
+                list.innerHTML = '<div class="placeholder">No notes yet. Tap Save note to get started! 📝</div>';
+                return;
+            }
+            list.innerHTML = currentUser.notes.map(note => `
+                <div class="note-item">
+                    <h4>${escapeHtml(note.title)}</h4>
+                    <p>${escapeHtml(note.body)}</p>
+                    <div class="note-meta">
+                        <span>${new Date(note.date).toLocaleString()}</span>
+                        <button class="note-delete" onclick="deleteNote(${note.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        function openShop() {
+            if (!currentUser) return;
+            renderPackages();
+            openModal('shopModal');
+        }
+
+        function renderPackages() {
+            const container = document.getElementById('packagesList');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                container.appendChild(createPackageRow(i, i));
+                const plus = parseFloat((i + 0.01).toFixed(2));
+                container.appendChild(createPackageRow(plus, plus));
+            }
+        }
+
+        function createPackageRow(credits, amount) {
+            const row = document.createElement('div');
+            row.className = 'package-row';
+            row.innerHTML = `
+                <div class="package-info">
+                    <h4>${credits.toFixed(2)} Credits</h4>
+                    <p>$${amount.toFixed(2)} USD • Instant Delivery</p>
+                </div>
+                <div class="package-action">
+                    <button onclick="startPurchase(${credits}, ${amount})">Buy</button>
+                </div>
+            `;
+            return row;
+        }
+
+        function startPurchase(credits, amount) {
+            showProcessing(`Buying ${credits.toFixed(2)} credits...`);
+            setTimeout(() => {
+                hideProcessing();
+                currentUser.balance += credits;
+                currentUser.transactions.unshift({
+                    id: Date.now(),
+                    credits,
+                    amount,
+                    date: new Date().toISOString()
+                });
+                updateBalanceUI();
+                renderTransactions();
+                populateProfileModal();
+                showToast(`+${credits.toFixed(2)} credits added! 🎉`);
+            }, 1500);
+        }
+
+        function renderTransactions() {
+            const list = document.getElementById('historyList');
+            if (!currentUser || currentUser.transactions.length === 0) {
+                list.innerHTML = '<div class="empty-state">No purchases yet. Grab credits from the Shop! 💸</div>';
+                return;
+            }
+            list.innerHTML = currentUser.transactions.map(tx => `
+                <div class="history-item">
+                    <h4>Txn #${tx.id}</h4>
+                    <p>${tx.credits.toFixed(2)} Credits • $${tx.amount.toFixed(2)}</p>
+                    <p>${new Date(tx.date).toLocaleString()}</p>
+                </div>
+            `).join('');
+        }
+
+        function openProfile() {
+            if (!currentUser) return;
+            populateProfileModal();
+            openModal('profileModal');
+        }
+
+        function populateProfileModal() {
+            const user = currentUser;
+            document.getElementById('profileNameInput').value = user.name;
+            document.getElementById('profileEmail').value = user.email;
+            document.getElementById('profileUID').value = user.uid;
+            document.getElementById('profileNumericUID').value = user.numericUID;
+            document.getElementById('profileBalance').value = `${user.balance.toFixed(2)} Credits`;
+            document.getElementById('profileCreated').value = new Date(user.created).toLocaleString();
+            document.getElementById('profileLastLogin').value = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '—';
+            document.getElementById('statNotes').textContent = user.notes.length;
+            document.getElementById('statTransactions').textContent = user.transactions.length;
+            const spent = user.transactions.reduce((sum, t) => sum + t.amount, 0).toFixed(2);
+            document.getElementById('statSpent').textContent = `$${spent}`;
+        }
+
+        function saveProfile() {
+            if (!currentUser) return;
+            const newName = document.getElementById('profileNameInput').value.trim();
+            if (!newName) {
+                showToast("Name can't be empty.", '#e63946');
+                return;
+            }
+            currentUser.name = newName;
+            showToast("Profile updated ✨");
+        }
+
+        function changePassword() {
+            if (!currentUser) return;
+            const newPass = prompt("Enter new password:");
+            if (!newPass) return;
+            currentUser.password = newPass;
+            showToast("Password changed ✅");
+        }
+
+        function sendReset() {
+            showToast("Reset email sent (simulated) 📧");
+        }
+
+        function copyText(inputId) {
+            const value = document.getElementById(inputId).value;
+            if (navigator.clipboard && value) {
+                navigator.clipboard.writeText(value).then(() => showToast("Copied to clipboard 📋"));
+            } else {
+                showToast("Copy not supported :(", '#e63946');
+            }
+        }
+
+        function logout() {
+            closeModal('profileModal');
+            closeModal('historyModal');
+            closeModal('shopModal');
+            currentUser = null;
+            showPage('login-page');
+            showToast("Logged out 👋");
+        }
+
+        function openTransactions() {
+            renderTransactions();
+            openModal('historyModal');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        function showProcessing(message) {
+            document.getElementById('processingText').textContent = message;
+            openModal('processingModal');
+        }
+        function hideProcessing() { closeModal('processingModal'); }
+
+  
