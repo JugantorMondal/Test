@@ -129,12 +129,12 @@
             box-shadow:0 15px 30px rgba(0,0,0,0.2);
         }
         .fab.profile {
-            top:15px; right:18px; background:white; color:#c33764;
-        }
-        .fab.menu {
             top:15px; left:18px;
             background:linear-gradient(135deg,#232526,#414345);
             color:white; font-size:1.4rem;
+        }
+        .fab.history {
+            top:15px; right:18px; background:white; color:#c33764;
         }
         .fab.chat {
             bottom:40px; right:22px; background:#212121; color:#f1faee;
@@ -280,7 +280,7 @@
         <div class="auth-container">
             <header class="auth-header">
                 <h1>Need a reset?</h1>
-                <p>We’ll send your hint instantly</p>
+                <p>We'll send your hint instantly</p>
             </header>
             <div class="form-container">
                 <div id="forgot-error" class="error-message"></div>
@@ -297,8 +297,8 @@
 
     <div id="app-page" class="page">
         <div class="phone-shell">
-            <button class="fab menu" id="openTransactions">☰</button>
-            <button class="fab profile" id="openProfile">👤</button>
+            <button class="fab profile" id="openProfile" title="Profile">☰</button>
+            <button class="fab history" id="openTransactions" title="History">📜</button>
             <button class="fab chat" onclick="showToast('Support coming soon ✨')">💬</button>
             <div class="status-bar">
                 <span id="status-time">11:36</span>
@@ -362,7 +362,7 @@
                 </div>
                 <div class="profile-field">
                     <label>Numeric UID</label>
-                    <div a class="copy-wrap">
+                    <div class="copy-wrap">
                         <input type="text" id="profileNumericUID" readonly>
                         <button onclick="copyText('profileNumericUID')">Copy</button>
                     </div>
@@ -455,14 +455,14 @@
 
         function login() {
             const email = document.getElementById('login-email').value.trim().toLowerCase();
-            thepassword = document.getElementById('login-password').value;
+            const password = document.getElementById('login-password').value;
             const error = document.getElementById('login-error');
-            if (!email || !thepassword) {
+            if (!email || !password) {
                 error.textContent = "Enter both email and password.";
                 error.style.display = 'block';
                 return;
             }
-            const user = users.find(u => u.email === email && u.password === thepassword);
+            const user = users.find(u => u.email === email && u.password === password);
             if (!user) {
                 error.textContent = "Invalid credentials. Try demo@jmnotepad.app / demo123";
                 error.style.display = 'block';
@@ -780,7 +780,8 @@
                     if (e.target === modal && id !== 'processingModal') closeModal(id);
                 });
             });
-            document.getElementById('login-password').addEventListener('keyup', (e)=>{ if(e.key==='Enter') login(); });
+            document.getElementById('login-password').addEventListener('keyup', (e) => { if(e.key === 'Enter') login(); });
+            document.getElementById('login-email').addEventListener('keyup', (e) => { if(e.key === 'Enter') login(); });
         });
     </script>
 </body>
